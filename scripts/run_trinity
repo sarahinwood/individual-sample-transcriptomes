@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+ bin/Trinity --SS_lib_type RF \
+    --max_memory 500G \
+    --CPU 20 \
+    --output output/trinity \
+    --left output/bbduk_trim/abdo_r1.fq.gz,output/bbduk_trim/thorax_r1.fq.gz \
+    --right output/bbduk_trim/abdo_r2.fq.gz,output/bbduk_trim/thorax_r2.fq.gz \
+	--seqType fq 
+
+
+
+
