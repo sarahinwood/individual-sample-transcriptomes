@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
- bin/Trinity --SS_lib_type RF \
+ bin/Trinity \
+ 	--SS_lib_type RF \
     --max_memory 500G \
     --CPU 20 \
     --output output/trinity \

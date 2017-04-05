@@ -4,11 +4,11 @@ bbduk="bin/bbmap/bbduk.sh"
 
 outdir="output/bbduk_trim"
 
-thorax_r1="data/NZGL02125/CA7HAANXX-2125-03-01-1_S21_L003_R1_001.fastq.gz"
-thorax_r2="data/NZGL02125/CA7HAANXX-2125-03-01-1_S21_L003_R2_001.fastq.gz"
+thorax_r1="data/thorax_r1.fastq.gz"
+thorax_r2="data/thorax_r2.fastq.gz"
 
-abdo_r1="data/NZGL02125/CA7HAANXX-2125-04-01-1_S22_L002_R1_001.fastq.gz"
-abdo_r2="data/NZGL02125/CA7HAANXX-2125-04-01-1_S22_L002_R2_001.fastq.gz"
+abdo_r1="data/abdo_r1.fastq.gz"
+abdo_r2="data/abdo_r2.fastq.gz"
 
 "${bbduk}" in="${thorax_r1}" in2="${thorax_r2}" \
     out=output/bbduk_trim/thorax_r1.fq.gz \
