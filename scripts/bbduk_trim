@@ -15,6 +15,7 @@ abdo_r2="data/abdo_r2.fastq.gz"
     out2=output/bbduk_trim/thorax_r2.fq.gz \
     ref=bin/bbmap/resources/adapters.fa \
     ktrim=r k=23 mink=11 hdist=1 tpe tbo \
+    qtrim=r trimq=15 \
     &> "${outdir}"/thorax.log.txt &
 
 "${bbduk}" in="${abdo_r1}" in2="${abdo_r2}" \
@@ -22,6 +23,7 @@ abdo_r2="data/abdo_r2.fastq.gz"
     out2=output/bbduk_trim/abdo_r2.fq.gz \
     ref=bin/bbmap/resources/adapters.fa \
     ktrim=r k=23 mink=11 hdist=1 tpe tbo \
+    qtrim=r trimq=15 \
     &> "${outdir}"/abdo.log.txt &
 
 wait

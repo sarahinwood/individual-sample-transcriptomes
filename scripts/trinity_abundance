@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export LD_LIBRARY_PATH=/usr/lib64
+
  bin/trinity/util/align_and_estimate_abundance.pl\
 	--transcripts output/trinity/Trinity.fasta \
 	--seqType fq \
