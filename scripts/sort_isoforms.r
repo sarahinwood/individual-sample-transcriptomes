@@ -7,3 +7,6 @@ fwrite(isoform.list[exp.rows,list(transcript_id)], 'output/trinity_abundance/iso
 length.rows <- isoform.list[,.I[which.max(length)], by=gene_id][,V1]
 isoform.list[length.rows,transcript_id]
 fwrite(isoform.list[length.rows,list(transcript_id)], 'output/trinity_abundance/isoforms_by_length.txt', col.names = FALSE)
+
+isoform.list[,hist(length)]
+isoform.list[length<250]
