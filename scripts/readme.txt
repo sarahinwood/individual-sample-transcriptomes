@@ -11,4 +11,5 @@ de novo transcriptome assembly using Trinity
 9. plot_x50.r
 10. sort_isoforms.r
 11. filter_trinity_isoforms
-12. for BUSCO analysis of the transcriptome, see asw-transcriptome-busco folder in /Network/Servers/biocldap.otago.ac.nz/Volumes/BiochemXsan/student_users/sarahinwood/Projects
+12. run_bowtie2
+13. for BUSCO analysis of the transcriptome, see asw-transcriptome-busco folder in /Network/Servers/biocldap.otago.ac.nz/Volumes/BiochemXsan/student_users/sarahinwood/Projects
