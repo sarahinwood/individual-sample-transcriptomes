@@ -74,6 +74,36 @@ rule target:
 			sample=all_samples),
 		'output/fastqc'
 
+rule bbmerge:
+	input:
+		r1 = 'output/bbduk_trim/{sample}_r1.fq.gz',
+		r2 = 'output/bbduk_trim/{sample}_r2.fq.gz'
+	output:
+		merged = 'output/bbmerge/{sample}_merged.fq.gz'
+		unm1 = 'output/bbmerge/{sample}_unmerged_r1.fq.gz'
+		unm2 = 'output/bbmerge/{sample}_unmerged_r2.fq.gz'
+		ihist = 'output/bbmerge/{sample}_ihist.txt'
+	params:
+		adapters = bbduk_adapters
+	log:
+		'output/logs/bbduk_merge/{sample}.log'
+	threads:
+		20
+	singularity:
+		bbduk_container
+	shell:
+		'bbmerge.sh '
+		'threads={threads} '
+		'in={input.r1} '
+		'in2={input.r2} '
+		'out={output.merged} '
+		'outu1={output.unm1} '
+		'outu2={output.unm2} '
+		'ihist={output.ihist} '
+		'verystrict=t '
+		'adapters={params.adapters} '
+		'&> {log}'
+
 rule fastqc:
 	input:
 		expand('output/bbduk_trim/{sample}_r{n}.fq.gz',
