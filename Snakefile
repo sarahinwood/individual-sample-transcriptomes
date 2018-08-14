@@ -72,7 +72,7 @@ all_samples = sorted(set(sample_key['Sample_name']))
 
 rule target:
 	input:
-		'output/trinity/Trinity.fasta'
+		'output/trinity/Trinity.fasta',
 		'output/fastqc'
 
 
