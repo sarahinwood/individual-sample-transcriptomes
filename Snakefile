@@ -75,7 +75,8 @@ rule target:
 
 rule bbduk_trim:
 	input:
-		unpack(sample_name_to_fastq)
+		r1 = 'output/joined/{sample}_r1.fq.gz',
+		r2 = 'output/joined/{sample}_r2.fq.gz'
 	output:
 		r1 = 'output/bbduk_trim/{sample}_r1.fq.gz',
 		r2 = 'output/bbduk_trim/{sample}_r2.fq.gz'
@@ -97,7 +98,18 @@ rule bbduk_trim:
 		'ktrim=r k=23 mink=11 hdist=1 tpe tbo qtrim=r trimq=15 '
 		'&> {log}'
 
-
+rule cat_reads:
+	input:
+		unpack(sample_name_to_fastq)
+	output:	
+		r1 = temp('output/joined/{sample}_r1.fq.gz'),
+		r2 = temp('output/joined/{sample}_r2.fq.gz')
+	threads:
+		1
+	shell:
+		'cat {input.r1} > {output.r1} & '
+		'cat {input.r2} > {output.r2} & '
+		'wait'
 
 
 
