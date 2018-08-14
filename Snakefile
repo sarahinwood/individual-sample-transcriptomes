@@ -104,7 +104,7 @@ rule run_Trinity:
 		'--right {params.right} '
 		'--seqType fq'
 
-rule merge_all_r1_reads
+rule merge_all_r1_reads:
 	input:
 		r1 = 'output/bbmerge/{sample}_unmerged_r1.fq.gz',
 		merged = 'output/bbmerge/{sample}_merged.fq.gz'
