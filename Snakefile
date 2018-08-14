@@ -71,7 +71,17 @@ all_samples = sorted(set(sample_key['Sample_name']))
 rule target:
 	input:
 		expand('output/bbduk_trim/{sample}_r1.fq.gz',
-			sample=all_samples)
+			sample=all_samples),
+		'output/fastqc'
+
+rule fastqc:
+	input:
+		expand('output/bbduk_trim/{sample}_r{n}.fq.gz',
+			sample=all_samples, n=[1,2])
+	output:
+		directory('output/fastqc')
+	shell:
+		'fastqc --outdir {output} {input}'
 
 rule bbduk_trim:
 	input:
