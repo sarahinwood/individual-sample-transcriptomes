@@ -52,6 +52,8 @@ bbduk_adapters = '/adapters.fa'
 
 #containers
 bbduk_container = 'shub://TomHarrop/singularity-containers:bbmap_38.00'
+busco_container = 'shub://TomHarrop/singularity-containers:busco_3.0.2'
+trinity_container = 'shub://TomHarrop/singularity-containers:trinity_2.6.6'
 
 #########
 # SETUP #
@@ -70,9 +72,46 @@ all_samples = sorted(set(sample_key['Sample_name']))
 
 rule target:
 	input:
-		expand('output/bbduk_trim/{sample}_r1.fq.gz',
-			sample=all_samples),
+		'output/trinity/Trinity.fasta'
 		'output/fastqc'
+
+
+
+rule run_Trinity:
+	input:
+		left = expand('output/bbmerge/{sample}_all_r1.fq.gz', sample=all_samples),
+		right = expand('output/bbmerge/{sample}_unmerged_r2.fq.gz', sample=all_samples)
+	output:
+		'output/trinity/Trinity.fasta',
+		'output/trinity/Trinity.fasta.gene_trans_map'
+	params:
+		outdir = 'output/trinity'
+		left = lambda wildcards, input: ','.join(sorted(set(input.left))),
+		right = lambda wildcards, input: ','.join(sorted(set(input.left)))
+	singularity:
+		trinity_container
+	threads:
+		20
+	log:
+		'output/logs/trinity.log'
+	shell:
+		'Trinity '
+		'--SS_lib_type RF '
+		'--max_memory 300G '
+		'--CPU {threads} '
+		'--output {params.outdir} '
+		'--left {params.left} '
+		'--right {params.right} '
+		'--seqType fq'
+
+rule merge_all_r1_reads
+	input:
+		r1 = 'output/bbmerge/{sample}_unmerged_r1.fq.gz',
+		merged = 'output/bbmerge/{sample}_merged.fq.gz'
+	output:
+		joined = 'output/bbmerge/{sample}_all_r1.fq.gz'
+	shell:
+		'cat {input.r1} {input.merged} > {output.joined}'
 
 rule bbmerge:
 	input:
@@ -87,10 +126,10 @@ rule bbmerge:
 		adapters = bbduk_adapters
 	log:
 		'output/logs/bbduk_merge/{sample}.log'
-	threads:
-		20
 	singularity:
 		bbduk_container
+	threads:
+		20
 	shell:
 		'bbmerge.sh '
 		'threads={threads} '
