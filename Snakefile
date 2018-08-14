@@ -85,9 +85,9 @@ rule run_Trinity:
 		'output/trinity/Trinity.fasta',
 		'output/trinity/Trinity.fasta.gene_trans_map'
 	params:
-		outdir = 'output/trinity'
+		outdir = 'output/trinity',
 		left = lambda wildcards, input: ','.join(sorted(set(input.left))),
-		right = lambda wildcards, input: ','.join(sorted(set(input.left)))
+		right = lambda wildcards, input: ','.join(sorted(set(input.right)))
 	singularity:
 		trinity_container
 	threads:
