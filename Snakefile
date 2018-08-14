@@ -79,9 +79,9 @@ rule bbmerge:
 		r1 = 'output/bbduk_trim/{sample}_r1.fq.gz',
 		r2 = 'output/bbduk_trim/{sample}_r2.fq.gz'
 	output:
-		merged = 'output/bbmerge/{sample}_merged.fq.gz'
-		unm1 = 'output/bbmerge/{sample}_unmerged_r1.fq.gz'
-		unm2 = 'output/bbmerge/{sample}_unmerged_r2.fq.gz'
+		merged = 'output/bbmerge/{sample}_merged.fq.gz',
+		unm1 = 'output/bbmerge/{sample}_unmerged_r1.fq.gz',
+		unm2 = 'output/bbmerge/{sample}_unmerged_r2.fq.gz',
 		ihist = 'output/bbmerge/{sample}_ihist.txt'
 	params:
 		adapters = bbduk_adapters
