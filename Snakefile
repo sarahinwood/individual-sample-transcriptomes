@@ -81,7 +81,9 @@ rule fastqc:
 	output:
 		directory('output/fastqc')
 	shell:
+		'mkdir -p {output} ; '
 		'fastqc --outdir {output} {input}'
+
 
 rule bbduk_trim:
 	input:
