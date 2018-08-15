@@ -74,7 +74,7 @@ all_samples = sorted(set(sample_key['Sample_name']))
 rule target:
 	input:
 		expand('output/trinity_filtered_isoforms/isoforms_by_{filter}.fasta',
-               filter=['expression', 'length'])
+               filter=['expression', 'length']),
 		'output/fastqc',
 		'output/trinity_stats/stats.txt',
 		'output/trinity_stats/xn50.out.txt',
