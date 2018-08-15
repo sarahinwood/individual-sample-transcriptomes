@@ -19,6 +19,8 @@ library(data.table)
 ###########
 
 abundance_file <- snakemake@input[["abundance"]]
+sorted_expression <- snakemake@output[["expression"]]
+sorted_length <- snakemake@output[["length"]]
 
 ########
 # MAIN #
@@ -29,12 +31,12 @@ isoform.list <- fread(abundance_file)
 #sort by expression
 isoforms_by_expression <- isoform.list[,.I[which.max(IsoPct)], by=gene_id][,V1]
 #write file sorted by expression
-fwrite(isoform.list[isoforms_by_expression,list(transcript_id)], 'output/trinity_filtered_isoforms/isoforms_by_expression.txt', col.names = FALSE)
+fwrite(isoform.list[isoforms_by_expression,list(transcript_id)], sorted_expression, col.names = FALSE)
 
 #sort by length
 isoforms_by_length <- isoform.list[,.I[which.max(length)], by=gene_id][,V1]
-#write file sorted by expression
-fwrite(isoform.list[lisoforms_by_length,list(transcript_id)], 'output/trinity_filtered_isoforms/isoforms_by_length.txt', col.names = FALSE)
+#write file sorted by length
+fwrite(isoform.list[lisoforms_by_length,list(transcript_id)], sorted_length, col.names = FALSE)
 
 #plot transcript lengths
 isoform.list[,hist(length, breaks = 100, xlim=c(0, +5000), main = "Transcript Lengths in New ASW Transcriptome Assembly", xlab = "Transcript Length (bp)")]

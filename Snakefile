@@ -101,12 +101,12 @@ rule sort_isoforms_r:
 	input:
 		abundance = 'output/trinity_abundance/RSEM.isoforms.results'
 	output:
-	    expression = 'output/trinity_filtered_isoforms/isoform_by_expression.txt',
-        length = 'output/trinity_filtered_isoforms/isoform_by_length.txt'
-	log:
-		'output/logs/sort_isoforms_r.log'
+		expression = 'output/trinity_filtered_isoforms/isoforms_by_expression.txt',
+		length = 'output/trinity_filtered_isoforms/isoforms_by_length.txt'
 	singularity:
 		tidyverse_container
+	log:
+		'output/logs/sort_isoforms_r.log'
 	script:
 		'scripts/sort_isoforms.r'
 
