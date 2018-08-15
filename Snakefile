@@ -103,10 +103,10 @@ rule sort_isoforms_r:
 	output:
 	    expression = 'output/trinity_filtered_isoforms/isoform_by_expression.txt',
         length = 'output/trinity_filtered_isoforms/isoform_by_length.txt'
-	singularity:
-		tidyverse_container
 	log:
 		'output/logs/sort_isoforms_r.log'
+	singularity:
+		tidyverse_container
 	script:
 		'scripts/sort_isoforms.r'
 
