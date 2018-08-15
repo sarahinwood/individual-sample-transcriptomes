@@ -53,6 +53,7 @@ bbduk_adapters = '/adapters.fa'
 #containers
 bbduk_container = 'shub://TomHarrop/singularity-containers:bbmap_38.00'
 busco_container = 'shub://TomHarrop/singularity-containers:busco_3.0.2'
+tidyverse_container = 'shub://TomHarrop/singularity-containers:r_3.5.0'
 trinity_container = 'shub://TomHarrop/singularity-containers:trinity_2.6.6'
 
 #########
@@ -72,12 +73,130 @@ all_samples = sorted(set(sample_key['Sample_name']))
 
 rule target:
 	input:
-		'output/trinity/Trinity.fasta',
-		'output/fastqc'
+		expand('output/trinity_filtered_isoforms/isoforms_by_{filter}.fasta',
+               filter=['expression', 'length'])
+		'output/fastqc',
+		'output/trinity_stats/stats.txt',
+		'output/trinity_stats/xn50.out.txt',
 
+rule filter_trinity_isoforms:
+	input:
+		transcriptome = 'output/trinity/Trinity.fasta'
+		isoforms = 'output/filtered_isoforms/isoform_by_{filter}.txt'
+	output:
+		sorted_fasta = 'output/trinity_filtered_isoforms/isoforms_by_{filter}.fasta'
+	log:
+		'output/logs/filter_isoforms_by_{filter}.log'
+	singularity:
+		bbduk_container
+	shell:
+		'filterbyname.sh '
+		'in={input.transcriptome} '
+		'include=t '
+		'names={input.isoforms} '
+		'out={output.sorted_fasta} ' 
+		'&> {log}'
 
+rule sort_isoforms_r:
+	input:
+		abundance = 'output/trinity_abundance/RSEM.isoforms.results'
+	output:
+	    expression = 'output/trinity_filtered_isoforms/isoform_by_expression.txt',
+        length = 'output/trinity_filtered_isoforms/isoform_by_length.txt'
+	singularity:
+		tidyverse_container
+	log:
+		'output/logs/sort_isoforms_r.log'
+	script:
+		'scripts/sort_isoforms.r'
 
-rule run_Trinity:
+rule ExN50_stats:
+	input:
+		abundance = 'output/trinity_abundance/RSEM.TPM.not_cross_norm',
+		transcriptome = 'output/trinity/Trinity.fasta'
+	output:
+		ExN50_stats = 'output/trinity_stats/xn50.out.txt'
+	singularity:
+		trinity_container
+	log:
+		'output/logs/xn50.err.txt'
+	shell:
+		'contig_ExN50_statistic.pl '
+		'{input.abundance} '
+		'{input.transcriptome} '
+		'>{output.ExN50_stats} '
+		'2>{log}'
+
+rule trinity_stats:
+	input:
+		transcriptome = 'output/trinity/Trinity.fasta'
+	output:
+		stats = 'output/trinity_stats/stats.txt'
+	singularity:
+		trinity_container
+	log:
+		'output/logs/trinity_stats.log'
+	shell:
+		'TrinityStats.pl '
+		'{input.transcriptome} '
+		'>{output.stats} '
+		'2>{log}'
+
+rule trinity_abundance_to_matrix:
+	input:
+		gt_map = 'output/trinity/Trinity.fasta.gene_trans_map',
+		abundance = 'output/trinity_abundance/RSEM.isoforms.results'
+	output:
+		'output/trinity_abundance/RSEM.isoform.counts.matrix',
+		'output/trinity_abundance/RSEM.TPM.not_cross_norm'
+	params:
+		prefix = 'output/trinity_abundance/RSEM'
+	singularity:
+		trinity_container
+	log:
+		'output/logs/abundance_estimates_to_matrix.log'
+	shell:
+		'abundance_estimates_to_matrix.pl '
+        '--est_method RSEM '
+        '--cross_sample_norm none '
+        '--out_prefix {params.prefix} '
+        '--gene_trans_map {input.gt_map} '
+        '{input.abundance} '
+        '&> {log}'
+
+rule trinity_abundance:
+	input:
+		transcripts = 'output/trinity/Trinity.fasta',
+		left = expand('output/bbmerge/{sample}_all_r1.fq.gz', sample=all_samples),
+		right = expand('output/bbmerge/{sample}_unmerged_r2.fq.gz', sample=all_samples)
+	output:
+		'output/trinity_abundance/RSEM.isoforms.results'
+	singularity:
+		trinity_container
+	threads:
+		20
+	log:
+		'output/logs/trinity_abundance.log'
+	params:
+		outdir = 'output/trinity_abundance',
+		left = lambda wildcards, input: ','.join(sorted(set(input.left))),
+		right = lambda wildcards, input: ','.join(sorted(set(input.right)))
+	shell:
+		'align_and_estimate_abundance.pl '
+		'--transcripts {input.transcripts} '
+		'--seqType fq '
+		'--est_method RSEM '
+		'--aln_method bowtie '
+		'--output_dir {params.outdir} '
+		'--prep_reference '
+		'--SS_lib_type RF '
+		'--thread_count {threads} '
+		'--trinity_mode '
+		'--left {params.left} '
+		'--right {params.right} '
+		'&> {log}'
+
+rule Trinity:
 	input:
 		left = expand('output/bbmerge/{sample}_all_r1.fq.gz', sample=all_samples),
 		right = expand('output/bbmerge/{sample}_unmerged_r2.fq.gz', sample=all_samples)
@@ -102,7 +221,8 @@ rule run_Trinity:
 		'--output {params.outdir} '
 		'--left {params.left} '
 		'--right {params.right} '
-		'--seqType fq'
+		'--seqType fq '
+		'&> {log}'
 
 rule merge_all_r1_reads:
 	input:

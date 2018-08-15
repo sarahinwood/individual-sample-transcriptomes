@@ -1,12 +1,44 @@
+#!/usr/bin/env Rscript
+
+#######
+# LOG #
+#######
+
+log <- file(snakemake@log[[1]], open = "wt")
+sink(log, type = "message")
+sink(log, append = TRUE, type = "output")
+
+#############
+# LIBRARIES #
+#############
+
 library(data.table)
-isoform.list <- fread('output/trinity_abundance/RSEM.isoforms.results')
-exp.rows <- isoform.list[,.I[which.max(IsoPct)], by=gene_id][,V1]
-fwrite(isoform.list[exp.rows,list(transcript_id)], 'output/trinity_abundance/isoforms_by_expression.txt', col.names = FALSE)
 
+###########
+# GLOBALS #
+###########
 
-length.rows <- isoform.list[,.I[which.max(length)], by=gene_id][,V1]
-isoform.list[length.rows,transcript_id]
-fwrite(isoform.list[length.rows,list(transcript_id)], 'output/trinity_abundance/isoforms_by_length.txt', col.names = FALSE)
+abundance_file <- snakemake@input[["abundance"]]
 
+########
+# MAIN #
+########
+
+isoform.list <- fread(abundance_file)
+
+#sort by expression
+isoforms_by_expression <- isoform.list[,.I[which.max(IsoPct)], by=gene_id][,V1]
+#write file sorted by expression
+fwrite(isoform.list[isoforms_by_expression,list(transcript_id)], 'output/trinity_filtered_isoforms/isoforms_by_expression.txt', col.names = FALSE)
+
+#sort by length
+isoforms_by_length <- isoform.list[,.I[which.max(length)], by=gene_id][,V1]
+#write file sorted by expression
+fwrite(isoform.list[lisoforms_by_length,list(transcript_id)], 'output/trinity_filtered_isoforms/isoforms_by_length.txt', col.names = FALSE)
+
+#plot transcript lengths
 isoform.list[,hist(length, breaks = 100, xlim=c(0, +5000), main = "Transcript Lengths in New ASW Transcriptome Assembly", xlab = "Transcript Length (bp)")]
 sum(isoform.list$length>500)
+
+# write log
+sessionInfo()
