@@ -81,7 +81,7 @@ rule target:
 
 rule filter_trinity_isoforms:
 	input:
-		transcriptome = 'output/trinity/Trinity.fasta'
+		transcriptome = 'output/trinity/Trinity.fasta',
 		isoforms = 'output/filtered_isoforms/isoform_by_{filter}.txt'
 	output:
 		sorted_fasta = 'output/trinity_filtered_isoforms/isoforms_by_{filter}.fasta'
