@@ -133,7 +133,7 @@ rule bowtie2_alignment_stats:
 		'-x {output.index} '
 		'-1 {params.left} '
 		'-2 {params.right} '
-		'2>&1 1> /dev/null | tee output/bowtie2/align_stats.txt'
+		'2>&1 1> /dev/null | tee {output.alignment_stats}'
 
 rule filter_trinity_isoforms:
 	input:
