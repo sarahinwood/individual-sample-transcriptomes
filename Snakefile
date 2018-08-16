@@ -73,7 +73,7 @@ all_samples = sorted(set(sample_key['Sample_name']))
 
 rule target:
 	input:
-		expand('output/busco/run_{filter}/full_table_{filter}.tsv',
+		expand('output/trinity_filtered_isoforms/isoforms_by_{filter}.fasta',
                filter=['expression', 'length']),
 		'output/fastqc',
 		'output/trinity_stats/stats.txt',
@@ -91,8 +91,8 @@ rule busco:
 		'busco_{filter}.log'
 	params:
 		wd = 'output/busco',
-        filtered_fasta = (lambda wildcards, input: resolve_path(input.filtered_fasta)),
-        lineage = (lambda wildcards, input: resolve_path(input.lineage))
+        filtered_fasta = lambda wildcards, input: resolve_path(input.filtered_fasta),
+        lineage = lambda wildcards, input: resolve_path(input.lineage)
 	threads:
 		20
 	singularity:
