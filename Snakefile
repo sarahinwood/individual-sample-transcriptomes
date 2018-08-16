@@ -90,7 +90,8 @@ rule busco:
 	output:
 		'output/busco/run_{filter}/full_table_{filter}.tsv'
 	log:
-        log = resolve_path('output/logs/busco_{filter}.log'
+        busco_log = str(pathlib2.Path(resolve_path('output/logs/'),
+                          'busco_{filter}.log'))
 	params:
 		wd = 'output/busco',
         lineage = lambda wildcards, input: resolve_path(input.lineage),
@@ -108,7 +109,7 @@ rule busco:
 		'--cpu {threads} '
 		'--species tribolium2012 '
 		'--mode transcriptome '
-		'&> {log.log}'
+		'&> {log.busco_log}'
 
 rule bowtie2_alignment_stats:
 	input:
