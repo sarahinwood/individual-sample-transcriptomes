@@ -8,6 +8,9 @@ import os
 # FUNCTIONS #
 #############
 
+def resolve_path(x):
+    return(str(pathlib2.Path(x).resolve(strict=False)))
+
 def find_read_files(read_dir):
 #Make list of files
 	path_generator = os.walk(read_dir, followlinks = True)
@@ -86,8 +89,9 @@ rule busco:
 		lineage = 'data/endopterygota_odb9'
 	output:
 		'output/busco/run_{filter}/full_table_{filter}.tsv'
-	log:
-		'busco_{filter}.log'
+	 log:
+        str(pathlib2.Path(resolve_path('output/logs/'),
+                          'busco_{filter}.log'))
 	params:
 		wd = 'output/busco',
         lineage = lambda wildcards, input: resolve_path(input.lineage),
