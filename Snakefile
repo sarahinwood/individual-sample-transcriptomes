@@ -168,8 +168,8 @@ rule trinity_abundance_to_matrix:
 rule trinity_abundance:
 	input:
 		transcripts = 'output/trinity/Trinity.fasta',
-		left = expand('output/bbduk_trim/{sample}_all_r1.fq.gz', sample=all_samples),
-		right = expand('output/bbduk_trim/{sample}_unmerged_r2.fq.gz', sample=all_samples)
+		left = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
+		right = expand('output/bbduk_trim/{sample}_r2.fq.gz', sample=all_samples)
 	output:
 		'output/trinity_abundance/RSEM.isoforms.results'
 	singularity:
@@ -312,10 +312,3 @@ rule cat_reads:
 		'cat {input.r1} > {output.r1} & '
 		'cat {input.r2} > {output.r2} & '
 		'wait'
-
-
-
-
-
-
-
