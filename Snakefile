@@ -89,7 +89,7 @@ rule busco:
 		lineage = 'data/endopterygota_odb9'
 	output:
 		'output/busco/run_{filter}/full_table_{filter}.tsv'
-	 log:
+	log:
         str(pathlib2.Path(resolve_path('output/logs/'),
                           'busco_{filter}.log'))
 	params:
