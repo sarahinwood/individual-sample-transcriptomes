@@ -80,6 +80,7 @@ rule target:
 		'output/trinity_stats/xn50.out.txt',
 		'output/trinity_stats/bowtie2_alignment_stats.txt'
 
+
 rule busco:
 	input:
 		filtered_fasta = 'output/trinity_filtered_isoforms/ioforms_by_{filter}.fasta',
