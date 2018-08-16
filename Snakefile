@@ -86,7 +86,7 @@ rule bowtie2_alignment_stats:
 		left = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
 		right = expand('output/bbduk_trim/{sample}_r2.fq.gz', sample=all_samples)
 	output:
-		index = 'output/trinity_stats/Trinity.fasta.index'
+		index = 'output/trinity_stats/Trinity.fasta.index',
 		alignment_stats = 'output/trinity_stats/bowtie2_alignment_stats.txt'
 	params:
 		left = lambda wildcards, input: ','.join(sorted(set(input.left))),
