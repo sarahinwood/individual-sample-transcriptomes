@@ -123,17 +123,17 @@ rule bowtie2_alignment_stats:
 	singularity:
 		trinity_container
 	shell:
-	'bowtie2-build '
-	'{input.transcriptome} '
-	'{output.index} || exit 1 ; '
-	'bowtie2 '
-	'-p 10 '
-	'-q '
-	'--threads {threads} '
-	'-x {output.index} '
-	'-1 {params.left} '
-	'-2 {params.right} '
-	'&> {output.alignment_stats}'
+		'bowtie2-build '
+		'{input.transcriptome} '
+		'{output.index} || exit 1 ; '
+		'bowtie2 '
+		'-p 10 '
+		'-q '
+		'--threads {threads} '
+		'-x {output.index} '
+		'-1 {params.left} '
+		'-2 {params.right} '
+		'&> {output.alignment_stats}'
 
 rule filter_trinity_isoforms:
 	input:
