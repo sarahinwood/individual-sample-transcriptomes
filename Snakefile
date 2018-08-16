@@ -304,8 +304,8 @@ rule cat_reads:
 	input:
 		unpack(sample_name_to_fastq)
 	output:	
-		r1 = temp('output/joined/{sample}_r1.fq.gz'),
-		r2 = temp('output/joined/{sample}_r2.fq.gz')
+		r1 = temp('output/joined/{sample}_r1.fq.gz', sample=all_samples),
+		r2 = temp('output/joined/{sample}_r2.fq.gz', sample=all_samples)
 	threads:
 		1
 	shell:
