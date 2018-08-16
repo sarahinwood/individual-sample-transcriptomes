@@ -90,8 +90,8 @@ rule busco:
 		'busco_{filter}.log'
 	params:
 		wd = 'output/busco',
-        filtered_fasta = lambda wildcards, input: resolve_path(input.filtered_fasta),
-        lineage = lambda wildcards, input: resolve_path(input.lineage)
+        lineage = lambda wildcards, input: resolve_path(input.lineage),
+        filtered_fasta = lambda wildcards, input: resolve_path(input.filtered_fasta) 
 	threads:
 		20
 	singularity:
