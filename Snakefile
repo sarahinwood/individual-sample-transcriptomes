@@ -90,8 +90,7 @@ rule busco:
 	output:
 		'output/busco/run_{filter}/full_table_{filter}.tsv'
 	log:
-        resolve_path('output/logs/'),
-                          'busco_{filter}.log'
+        lambda wildcards, input: resolve_path('output/logs/busco_{filter}.log'
 	params:
 		wd = 'output/busco',
         lineage = lambda wildcards, input: resolve_path(input.lineage),
