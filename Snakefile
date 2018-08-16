@@ -82,7 +82,7 @@ rule target:
 
 rule busco:
 	input:
-		filtered_fasta = 'output/trinity_filtered_isoforms/ioforms_by_{filter}.fasta'
+		filtered_fasta = 'output/trinity_filtered_isoforms/ioforms_by_{filter}.fasta',
 		lineage = 'data/endopterygota_odb9'
 	output:
 		'output/busco/run_{filter}/full_table_{filter}.tsv'
