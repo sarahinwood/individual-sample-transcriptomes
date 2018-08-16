@@ -93,8 +93,6 @@ rule busco:
 		wd = 'output/busco',
         filtered_fasta = lambda wildcards, input: resolve_path(input.filtered_fasta),
         lineage = lambda wildcards, input: resolve_path(input.lineage)
-	threads:
-		20
 	singularity:
 		busco_container
 	shell:
@@ -103,7 +101,7 @@ rule busco:
 		'--in {params.filtered_fasta}'
 		'--out {wildcards.filter} '
 		'--lineage {params.lineage} '
-		'--cpu {threads} '
+		'--cpu 20 '
 		'--species tribolium2012 '
 		'--mode transcriptome '
 		'&> {log}'
