@@ -80,34 +80,6 @@ rule target:
 		'output/trinity_stats/xn50.out.txt',
 		'output/trinity_stats/bowtie2_alignment_stats.txt'
 
-
-rule busco:
-	input:
-		filtered_fasta = 'output/trinity_filtered_isoforms/ioforms_by_{filter}.fasta',
-		lineage = 'data/endopterygota_odb9'
-	output:
-		'output/busco/run_{filter}/full_table_{filter}.tsv'
-	log:
-		'busco_{filter}.log'
-	params:
-		wd = 'output/busco',
-        filtered_fasta = lambda wildcards, input: resolve_path(input.filtered_fasta),
-        lineage = lambda wildcards, input: resolve_path(input.lineage)
-	threads:
-		20
-	singularity:
-		busco_container
-	shell:
-		'cd {params.wd} || exit 1 ; '
-		'run_BUSCO.py '
-		'--in {params.filtered_fasta}'
-		'--out {wildcards.filter} '
-		'--lineage {params.lineage} '
-		'--cpu {threads} '
-		'--species tribolium2012 '
-		'--mode transcriptome '
-		'&> {log}'
-
 rule bowtie2_alignment_stats:
 	input:
 		transcriptome = 'output/trinity/Trinity.fasta'
