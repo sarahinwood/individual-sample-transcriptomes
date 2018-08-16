@@ -73,11 +73,60 @@ all_samples = sorted(set(sample_key['Sample_name']))
 
 rule target:
 	input:
-		expand('output/trinity_filtered_isoforms/isoforms_by_{filter}.fasta',
+		expand('output/busco/run_{filter}/full_table_{filter}.tsv',
                filter=['expression', 'length']),
 		'output/fastqc',
 		'output/trinity_stats/stats.txt',
 		'output/trinity_stats/xn50.out.txt',
+
+
+
+
+rule busco:
+	input:
+		filtered_fasta = 'output/trinity_filtered_isoforms/ioforms_by_{filter}.fasta'
+		lineage = 'data/endopterygota_odb9'
+	output:
+		'output/busco/run_{filter}/full_table_{filter}.tsv'
+	log:
+        str(pathlib2.Path(resolve_path('output/logs/'),
+                          'busco_{filter}.log'))
+	params:
+		wd = 'output/busco',
+        filtered_fasta = lambda wildcards, input: resolve_path(input.filtered_fasta),
+        lineage = lambda wildcards, input: resolve_path(input.lineage)
+	threads:
+		20
+	singularity:
+		busco_container
+	shell:
+		'cd {params.wd} || exit 1 ; '
+		'run_BUSCO.py '
+		'--in {params.filtered_fasta}'
+		'--out {wildcards.filter} '
+		'--lineage {params.lineage} '
+		'--cpu {threads} '
+		'--species tribolium2012 '
+		'--mode transcriptome '
+		'&> {log}'
+
+
+
+
+
+
+
+rule bowtie2: #gives % of reads that align back to transcriptome
+	input:
+	output:
+	log:
+	params:
+	threads:
+	singularity:
+	shell:
+
+
+
 
 rule filter_trinity_isoforms:
 	input:
@@ -167,8 +216,8 @@ rule trinity_abundance_to_matrix:
 rule trinity_abundance:
 	input:
 		transcripts = 'output/trinity/Trinity.fasta',
-		left = expand('output/bbmerge/{sample}_all_r1.fq.gz', sample=all_samples),
-		right = expand('output/bbmerge/{sample}_unmerged_r2.fq.gz', sample=all_samples)
+		left = expand('output/bbduk_trim/{sample}_all_r1.fq.gz', sample=all_samples),
+		right = expand('output/bbduk_trim/{sample}_unmerged_r2.fq.gz', sample=all_samples)
 	output:
 		'output/trinity_abundance/RSEM.isoforms.results'
 	singularity:
