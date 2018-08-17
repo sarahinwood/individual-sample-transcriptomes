@@ -135,7 +135,7 @@ rule bowtie2_alignment_stats:
         '-x {output.index} '
         '-1 {params.left} '
         '-2 {params.right} '
-        '2>&1 1> /dev/null | tee {output.alignment_stats}'
+        '1> /dev/null 2> {output.alignment_stats}'
 
 rule filter_trinity_isoforms:
     input:
@@ -155,7 +155,7 @@ rule filter_trinity_isoforms:
         'out={output.sorted_fasta} ' 
         '&> {log}'
 
-rule sort_isoforms_r: #R script returned non-zero exit status
+rule sort_isoforms_r:
     input:
         abundance = 'output/trinity_abundance/RSEM.isoforms.results'
     output:
@@ -167,11 +167,6 @@ rule sort_isoforms_r: #R script returned non-zero exit status
         'output/logs/sort_isoforms_r.log'
     script:
         'scripts/sort_isoforms.R'
-
-#Error in is.list(x) : 
-#  lisoforms_by_length is not found in calling scope and it is not a column of type logical. When the first argument inside DT[...] is a single symbol, data.table looks for it in calling scope.
-#Calls: fwrite ... tryCatch -> tryCatchList -> tryCatchOne -> <Anonymous>
-#Execution halted
 
 rule ExN50_stats:
     input:

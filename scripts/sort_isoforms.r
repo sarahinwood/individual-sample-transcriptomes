@@ -35,7 +35,7 @@ fwrite(isoform.list[isoforms_by_expression,list(transcript_id)],
 #sort by length
 isoforms_by_length <- isoform.list[,.I[which.max(length)], by=gene_id][,V1]
 #write file sorted by length
-fwrite(isoform.list[lisoforms_by_length,list(transcript_id)],
+fwrite(isoform.list[isoforms_by_length,list(transcript_id)],
 	snakemake@output[["length"]], col.names = FALSE)
 
 #plot transcript lengths
