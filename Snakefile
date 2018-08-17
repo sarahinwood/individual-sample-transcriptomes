@@ -155,7 +155,7 @@ rule filter_trinity_isoforms:
         'out={output.sorted_fasta} ' 
         '&> {log}'
 
-rule sort_isoforms_r:
+rule sort_isoforms_r: #R script returned non-zero exit status
     input:
         abundance = 'output/trinity_abundance/RSEM.isoforms.results'
     output:
@@ -168,9 +168,14 @@ rule sort_isoforms_r:
     script:
         'scripts/sort_isoforms.R'
 
+#Error in is.list(x) : 
+#  lisoforms_by_length is not found in calling scope and it is not a column of type logical. When the first argument inside DT[...] is a single symbol, data.table looks for it in calling scope.
+#Calls: fwrite ... tryCatch -> tryCatchList -> tryCatchOne -> <Anonymous>
+#Execution halted
+
 rule ExN50_stats:
     input:
-        abundance = 'output/trinity_abundance/RSEM.TPM.not_cross_norm',
+        abundance = 'output/trinity_abundance/RSEM.isoform.TPM.not_cross_norm',
         transcriptome = 'output/trinity/Trinity.fasta'
     output:
         ExN50_stats = 'output/trinity_stats/xn50.out.txt'
@@ -206,7 +211,7 @@ rule trinity_abundance_to_matrix:
         abundance = 'output/trinity_abundance/RSEM.isoforms.results'
     output:
         'output/trinity_abundance/RSEM.isoform.counts.matrix',
-        'output/trinity_abundance/RSEM.TPM.not_cross_norm'
+        'output/trinity_abundance/RSEM.isoform.TPM.not_cross_norm'
     params:
         prefix = 'output/trinity_abundance/RSEM'
     singularity:
