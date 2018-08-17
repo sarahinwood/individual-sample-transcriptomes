@@ -79,8 +79,7 @@ rule target:
         expand('output/busco/run_{filter}/full_table_{filter}.tsv',
                filter=['expression', 'length']),
         'output/fastqc',
-        'output/trinity_stats/stats.txt',
-        'output/trinity_stats/xn50.out.txt'
+        'output/trinity_stats/stats.txt'
 
 
 
@@ -111,7 +110,7 @@ rule busco:
         '--mode transcriptome '
         '&> {log}'
 
-rule bowtie2_alignment_stats:
+rule bowtie2_alignment_stats: #doesn't generate the expected output file so crashes (taken off target so other would run)
     input:
         transcriptome = 'output/trinity/Trinity.fasta',
         left = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
@@ -184,7 +183,8 @@ rule ExN50_stats:
         'contig_ExN50_statistic.pl '
         '{input.abundance} '
         '{input.transcriptome} '
-        '>{output.ExN50_stats}'
+        '>{output.ExN50_stats} ' ##has error with lines 187 & 188 (taken off target so others would run)
+        '2>{log}'
 
 rule trinity_stats:
     input:
