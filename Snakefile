@@ -80,8 +80,7 @@ rule target:
                filter=['expression', 'length']),
         'output/fastqc',
         'output/trinity_stats/stats.txt',
-        'output/trinity_stats/xn50.out.txt',
-        'output/trinity_stats/bowtie2_alignment_stats.txt'
+        'output/trinity_stats/xn50.out.txt'
 
 rule busco:
     input:
