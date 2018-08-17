@@ -184,8 +184,7 @@ rule ExN50_stats:
         'contig_ExN50_statistic.pl '
         '{input.abundance} '
         '{input.transcriptome} '
-        '>{output.ExN50_stats} '
-        '2>{log}'
+        '>{output.ExN50_stats}'
 
 rule trinity_stats:
     input:
