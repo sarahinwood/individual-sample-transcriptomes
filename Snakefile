@@ -82,11 +82,6 @@ rule target:
         'output/trinity_stats/stats.txt',
         'output/trinity_stats/xn50.out.txt'
 
-
-#INFO    Delete the current result folder and start a new run
-#ERROR   Cannot write to the temp directory, please make sure you have write permissions to ./tmp/
-#ERROR   BUSCO analysis failed !
-
 rule busco:
     input:
         filtered_fasta = 'output/trinity_filtered_isoforms/isoforms_by_{filter}.fasta',
