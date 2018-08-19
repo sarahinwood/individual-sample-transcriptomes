@@ -57,7 +57,7 @@ bbduk_adapters = '/adapters.fa'
 bbduk_container = 'shub://TomHarrop/singularity-containers:bbmap_38.00'
 busco_container = 'shub://TomHarrop/singularity-containers:busco_3.0.2'
 tidyverse_container = 'shub://TomHarrop/singularity-containers:r_3.5.0'
-trinity_container = 'shub://TomHarrop/singularity-containers:trinity_2.6.6'
+trinity_container = 'shub://TomHarrop/singularity-containers:trinity_2.8.0'
 
 #########
 # SETUP #
@@ -87,7 +87,7 @@ rule target:
 #ERROR   Cannot write to the temp directory, please make sure you have write permissions to ./tmp/
 #ERROR   BUSCO analysis failed !
 
-rule busco: #not running for isoforms by length
+rule busco:
     input:
         filtered_fasta = 'output/trinity_filtered_isoforms/isoforms_by_{filter}.fasta',
         lineage = 'data/endopterygota_odb9'
@@ -188,7 +188,7 @@ rule ExN50_stats: #hasn't actually generated output
         'contig_ExN50_statistic.pl '
         '{input.abundance} '
         '{input.transcriptome} '
-        '>{output.ExN50_stats} ' ##has error with lines 187 & 188 (taken off target so others would run)
+        '>{output.ExN50_stats} '
         '2>{log}'
 
 rule trinity_stats:
