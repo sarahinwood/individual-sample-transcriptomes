@@ -79,11 +79,15 @@ rule target:
         expand('output/busco/run_{filter}/full_table_{filter}.tsv',
                filter=['expression', 'length']),
         'output/fastqc',
-        'output/trinity_stats/stats.txt'
+        'output/trinity_stats/stats.txt',
+        'output/trinity_stats/xn50.out.txt'
 
 
+#INFO    Delete the current result folder and start a new run
+#ERROR   Cannot write to the temp directory, please make sure you have write permissions to ./tmp/
+#ERROR   BUSCO analysis failed !
 
-rule busco:
+rule busco: #not running for isoforms by length
     input:
         filtered_fasta = 'output/trinity_filtered_isoforms/isoforms_by_{filter}.fasta',
         lineage = 'data/endopterygota_odb9'
