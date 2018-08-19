@@ -102,7 +102,7 @@ rule busco:
     shell:
         'cd {params.wd} || exit 1 ; '
         'run_BUSCO.py '
-        '--in {params.filtered_fasta}'
+        '--in {params.filtered_fasta} '
         '--out {wildcards.filter} '
         '--lineage {params.lineage} '
         '--cpu {threads} '
@@ -169,7 +169,7 @@ rule sort_isoforms_r:
     script:
         'scripts/sort_isoforms.R'
 
-rule ExN50_stats:
+rule ExN50_stats: #hasn't actually generated output
     input:
         abundance = 'output/trinity_abundance/RSEM.isoform.TPM.not_cross_norm',
         transcriptome = 'output/trinity/Trinity.fasta'
