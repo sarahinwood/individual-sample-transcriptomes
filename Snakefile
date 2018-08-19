@@ -108,6 +108,7 @@ rule busco:
         '--cpu {threads} '
         '--species tribolium2012 '
         '--mode transcriptome '
+        '-f '
         '&> {log}'
 
 rule bowtie2_alignment_stats: #doesn't generate the expected output file so crashes (taken off target so other would run)
