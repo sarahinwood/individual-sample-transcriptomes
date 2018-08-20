@@ -114,7 +114,7 @@ rule busco:
 
 rule transrate:
     input:
-        transcriptome = 'output/trinity/Trinity.fasta'
+        transcriptome = 'output/trinity/Trinity.fasta',
         left = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
         right = expand('output/bbduk_trim/{sample}_r2.fq.gz', sample=all_samples)
     output:
