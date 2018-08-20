@@ -81,7 +81,8 @@ rule target:
         'output/fastqc',
         'output/trinity_stats/stats.txt',
         'output/trinity_stats/xn50.out.txt',
-        'output/trinity_stats/bowtie2_alignment_stats.txt'
+        'output/trinity_stats/bowtie2_alignment_stats.txt',
+        'output/transrate/Trinity/contigs.csv'
 
 rule busco:
     input:
@@ -111,15 +112,41 @@ rule busco:
         '-f '
         '&> {log}'
 
-rule bowtie2_alignment_stats: #doesn't generate the expected output file so crashes (taken off target so other would run)
+rule transrate:
+    input:
+        transcriptome = 'output/trinity/Trinity.fasta'
+        left = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
+        right = expand('output/bbduk_trim/{sample}_r2.fq.gz', sample=all_samples)
+    output:
+        'output/transrate/Trinity/contigs.csv'
+    log:
+        'output/logs/transrate.log'
+    params:
+        left = lambda wildcards, input: ','.join(sorted(set(input.left))),
+        right = lambda wildcards, input: ','.join(sorted(set(input.right)))
+         out_dir = 'output/transrate/'
+    threads:
+        20
+    shell:
+        'bin/transrate/transrate '
+        '--assembly {input.transcriptome} '
+        '--left {params.left} '
+        '--right {params.right} '
+        '--output {params.outdir} '
+        '--threads {threads} '
+        '--loglevel error '
+        '&> {log}'
+
+
+rule bowtie2_alignment_stats:
     input:
         transcriptome = 'output/trinity/Trinity.fasta',
         left = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
         right = expand('output/bbduk_trim/{sample}_r2.fq.gz', sample=all_samples)
     output:
-        index = 'output/trinity_stats/Trinity.fasta.index',
         alignment_stats = 'output/trinity_stats/bowtie2_alignment_stats.txt'
     params:
+        index_basename = 'output/trinity_stats/Trinity.fasta.index'
         left = lambda wildcards, input: ','.join(sorted(set(input.left))),
         right = lambda wildcards, input: ','.join(sorted(set(input.right)))
     threads:
@@ -129,12 +156,12 @@ rule bowtie2_alignment_stats: #doesn't generate the expected output file so cras
     shell:
         'bowtie2-build '
         '{input.transcriptome} '
-        '{output.index} || exit 1 ; '
+        '{params.index_basename} || exit 1 ; '
         'bowtie2 '
         '-p 10 '
         '-q '
         '--threads {threads} '
-        '-x {output.index} '
+        '-x {params.index_basename} '
         '-1 {params.left} '
         '-2 {params.right} '
         '1> /dev/null 2> {output.alignment_stats}'
@@ -170,7 +197,7 @@ rule sort_isoforms_r:
     script:
         'scripts/sort_isoforms.R'
 
-rule ExN50_stats: #hasn't actually generated output
+rule ExN50_stats:
     input:
         abundance = 'output/trinity_abundance/RSEM.isoform.TPM.not_cross_norm',
         transcriptome = 'output/trinity/Trinity.fasta'
