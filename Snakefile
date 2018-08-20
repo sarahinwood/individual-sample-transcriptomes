@@ -123,7 +123,7 @@ rule transrate:
         'output/logs/transrate.log'
     params:
         left = lambda wildcards, input: ','.join(sorted(set(input.left))),
-        right = lambda wildcards, input: ','.join(sorted(set(input.right)))
+        right = lambda wildcards, input: ','.join(sorted(set(input.right))),
          out_dir = 'output/transrate/'
     threads:
         20
