@@ -84,6 +84,31 @@ rule target:
         'output/trinity_stats/bowtie2_alignment_stats.txt',
         'output/transrate/Trinity/contigs.csv'
 
+rule trinotate:
+    input:
+        fasta = 'output/trinity/Trinity.fasta',
+        blastdb = 'bin/trinotate/db/uniprot_sprot.pep',
+        hmmerdb = 'bin/trinotate/db/Pfam-A.hmm',
+        sqldb = 'bin/trinotate/db/Trinotate.sqlite'
+    output:
+        'output/trinotate/trinotate/trinotate_annotation_report.txt',
+        'output/trinotate/trinotate/Trinotate.sqlite'
+    params:
+        wd = 'output/trinotate'
+    threads:
+        20
+    log:
+        'output/logs/trinotate.log'
+    shell:
+        'trinotate_pipeline '
+        '--trinity_fasta {input.fasta} '
+        '--blast_db {input.blastdb} '
+        '--hmmer_db {input.hmmerdb} '
+        '--sqlite_db {input.sqldb} '
+        '--outdir {params.wd} '
+        '--threads {threads} '
+        '&> {log}'
+
 rule busco:
     input:
         filtered_fasta = 'output/trinity_filtered_isoforms/isoforms_by_{filter}.fasta',
