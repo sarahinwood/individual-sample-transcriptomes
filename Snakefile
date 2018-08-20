@@ -124,7 +124,7 @@ rule transrate:
     params:
         left = lambda wildcards, input: ','.join(sorted(set(input.left))),
         right = lambda wildcards, input: ','.join(sorted(set(input.right))),
-         out_dir = 'output/transrate/'
+         outdir = 'output/transrate/'
     threads:
         20
     shell:
