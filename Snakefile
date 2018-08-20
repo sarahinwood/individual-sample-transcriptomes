@@ -146,7 +146,7 @@ rule bowtie2_alignment_stats:
     output:
         alignment_stats = 'output/trinity_stats/bowtie2_alignment_stats.txt'
     params:
-        index_basename = 'output/trinity_stats/Trinity.fasta.index'
+        index_basename = 'output/trinity_stats/Trinity.fasta.index',
         left = lambda wildcards, input: ','.join(sorted(set(input.left))),
         right = lambda wildcards, input: ','.join(sorted(set(input.right)))
     threads:
