@@ -82,7 +82,8 @@ rule target:
         'output/trinity_stats/stats.txt',
         'output/trinity_stats/xn50.out.txt',
         'output/trinity_stats/bowtie2_alignment_stats.txt',
-        'output/transrate/Trinity/contigs.csv'
+        'output/transrate/Trinity/contigs.csv',
+        'output/trinotate/trinotate/Trinotate.sqlite'
 
 rule trinotate:
     input:
