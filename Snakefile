@@ -58,6 +58,7 @@ bbduk_container = 'shub://TomHarrop/singularity-containers:bbmap_38.00'
 busco_container = 'shub://TomHarrop/singularity-containers:busco_3.0.2'
 tidyverse_container = 'shub://TomHarrop/singularity-containers:r_3.5.0'
 trinity_container = 'shub://TomHarrop/singularity-containers:trinity_2.8.0'
+salmon_container = 'shub://TomHarrop/singularity-containers:salmon_0.11.1'
 
 #########
 # SETUP #
@@ -76,14 +77,64 @@ all_samples = sorted(set(sample_key['Sample_name']))
 
 rule target:
     input:
-        expand('output/busco/run_{filter}/full_table_{filter}.tsv',
-               filter=['expression', 'length']),
         'output/fastqc',
         'output/trinity_stats/stats.txt',
         'output/trinity_stats/xn50.out.txt',
+        expand('output/busco/run_{filter}/full_table_{filter}.tsv',
+               filter=['expression', 'length']),
         'output/trinity_stats/bowtie2_alignment_stats.txt',
         'output/transrate/Trinity/contigs.csv',
-        'output/trinotate/trinotate/Trinotate.sqlite'
+        'output/trinotate/trinotate/Trinotate.sqlite',
+        expand('output/salmon/{sample}_quant/quant.sf',
+                sample=all_samples)
+
+rule salmon_quant:
+    input:
+        index_output = 'output/salmon/transcripts_index/hash.bin',
+        left = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
+        right = expand('output/bbduk_trim/{sample}_r2.fq.gz', sample=all_samples)
+    output:
+        'output/salmon/{sample}_quant/quant.sf'
+    params:
+        index_outdir = 'output/salmon/transcripts_index',
+        left = lambda wildcards, input: ','.join(sorted(set(input.left))),
+        right = lambda wildcards, input: ','.join(sorted(set(input.right))),
+        outdir = 'output/salmon/{sample}_quant'
+    threads:
+        20
+    singularity:
+        salmon_container
+    log:
+        'output/logs/salmon_quant.log'
+    shell:
+        'salmon quant '
+        '-i {params.index_outdir} '
+        '-1 {params.left} '
+        '-2 {params.right} '
+        '-o {params.outdir} '
+        '-p {threads} '
+        '&> {log}'
+
+rule salmon_index:
+    input:
+        transcriptome_length_filtered = 'output/trinity_filtered_isoforms/isoforms_by_length.fasta'
+    output:
+        'output/salmon/transcripts_index/hash.bin'
+    params:
+        outdir = 'output/salmon/transcripts_index'
+    threads:
+        20
+    singularity:
+        salmon_container
+    log:
+        'output/logs/salmon_index.log'
+    shell:
+        'salmon index '
+        '-t {input.transcriptome_length_filtered} '
+        '-i {params.outdir} '
+        '-p {threads} '
+        '&> {log}'
+
 
 rule trinotate:
     input:
