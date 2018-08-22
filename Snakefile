@@ -109,6 +109,7 @@ rule salmon_quant:
     shell:
         'salmon quant '
         '-i {params.index_outdir} '
+        '-l ISR '
         '-1 {params.left} '
         '-2 {params.right} '
         '-o {params.outdir} '
