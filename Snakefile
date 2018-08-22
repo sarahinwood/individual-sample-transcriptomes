@@ -91,8 +91,8 @@ rule target:
 rule salmon_quant:
     input:
         index_output = 'output/salmon/transcripts_index/hash.bin',
-        left = expand('data/{sample}_r1.fq.gz', sample=all_samples),
-        right = expand('data/{sample}_r2.fq.gz', sample=all_samples)
+        left = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
+        right = expand('output/bbduk_trim/{sample}_r2.fq.gz', sample=all_samples)
     output:
         expand('output/salmon/{sample}_quant/quant.sf', sample = all_samples)
     params:
