@@ -94,12 +94,12 @@ rule salmon_quant:
         left = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
         right = expand('output/bbduk_trim/{sample}_r2.fq.gz', sample=all_samples)
     output:
-        'output/salmon/{sample}_quant/quant.sf'
+        expand('output/salmon/{sample}_quant/quant.sf', sample = all_samples)
     params:
         index_outdir = 'output/salmon/transcripts_index',
         left = lambda wildcards, input: ','.join(sorted(set(input.left))),
         right = lambda wildcards, input: ','.join(sorted(set(input.right))),
-        outdir = 'output/salmon/{sample}_quant'
+        outdir = expand('output/salmon/{sample}_quant', sample = all_samples)
     threads:
         20
     singularity:
