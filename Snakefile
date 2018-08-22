@@ -77,11 +77,11 @@ all_samples = sorted(set(sample_key['Sample_name']))
 
 rule target:
     input:
-        'output/fastqc',
-        'output/trinity_stats/stats.txt',
-        'output/trinity_stats/xn50.out.txt',
         expand('output/busco/run_{filter}/full_table_{filter}.tsv',
-               filter=['expression', 'length']),
+                filter=['expression', 'length']),
+         'output/fastqc',
+         'output/trinity_stats/stats.txt',
+         'output/trinity_stats/xn50.out.txt',
         'output/trinity_stats/bowtie2_alignment_stats.txt',
         'output/transrate/Trinity/contigs.csv',
         'output/trinotate/trinotate/Trinotate.sqlite',
