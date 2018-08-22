@@ -91,14 +91,12 @@ rule target:
 rule salmon_quant:
     input:
         index_output = 'output/salmon/transcripts_index/hash.bin',
-        left = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
-        right = expand('output/bbduk_trim/{sample}_r2.fq.gz', sample=all_samples)
+        left = 'output/bbduk_trim/{sample}_r1.fq.gz',
+        right = 'output/bbduk_trim/{sample}_r2.fq.gz'
     output:
         expand('output/salmon/{sample}_quant/quant.sf', sample = all_samples)
     params:
         index_outdir = 'output/salmon/transcripts_index',
-        left = lambda wildcards, input: ','.join(sorted(set(input.left))),
-        right = lambda wildcards, input: ','.join(sorted(set(input.right))),
         outdir = expand('output/salmon/{sample}_quant', sample = all_samples)
     threads:
         20
@@ -110,8 +108,8 @@ rule salmon_quant:
         'salmon quant '
         '-i {params.index_outdir} '
         '-l ISR '
-        '-1 {params.left} '
-        '-2 {params.right} '
+        '-1 {input.left} '
+        '-2 {input.right} '
         '-o {params.outdir} '
         '-p {threads} '
         '&> {log}'
