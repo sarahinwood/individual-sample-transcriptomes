@@ -57,7 +57,8 @@ bbduk_adapters = '/adapters.fa'
 bbduk_container = 'shub://TomHarrop/singularity-containers:bbmap_38.00'
 busco_container = 'shub://TomHarrop/singularity-containers:busco_3.0.2'
 tidyverse_container = 'shub://TomHarrop/singularity-containers:r_3.5.0'
-trinity_container = 'shub://TomHarrop/singularity-containers:trinity_2.8.0'
+old_trinity_container = 'shub://TomHarrop/singularity-containers:trinity_2.8.0'
+trinity_container = 'shub://TomHarrop/singularity-containers:trinity_2.8.3'
 salmon_container = 'shub://TomHarrop/singularity-containers:salmon_0.11.1'
 
 #########
@@ -85,8 +86,7 @@ rule target:
         'output/trinity_stats/bowtie2_alignment_stats.txt',
         'output/transrate/Trinity/contigs.csv',
         'output/trinotate/trinotate/Trinotate.sqlite',
-        expand('output/salmon/{sample}_quant/quant.sf',
-                sample=all_samples)
+        expand('output/salmon/{sample}_quant/quant.sf', sample=all_samples)
 
 rule salmon_quant:
     input:
