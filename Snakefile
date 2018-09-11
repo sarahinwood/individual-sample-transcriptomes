@@ -86,32 +86,31 @@ rule target:
         'output/trinity_stats/bowtie2_alignment_stats.txt',
         'output/transrate/Trinity/contigs.csv',
         'output/trinotate/trinotate/Trinotate.sqlite',
-        expand('output/salmon/{sample}_quant/quant.sf', sample=all_samples)
+        expand('output/salmon/{sample}_quant/quant.sf',
+            sample=all_samples)
 
 rule salmon_quant:
     input:
         index_output = 'output/salmon/transcripts_index/hash.bin',
-        left = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
-        right = expand('output/bbduk_trim/{sample}_r2.fq.gz', sample=all_samples)
+        left = 'output/bbduk_trim/{sample}_r1.fq.gz',
+        right = 'output/bbduk_trim/{sample}_r2.fq.gz'
     output:
-        expand('output/salmon/{sample}_quant/quant.sf', sample = all_samples)
+        'output/salmon/{sample}_quant/quant.sf'
     params:
         index_outdir = 'output/salmon/transcripts_index',
-        left = lambda wildcards, input: ','.join(sorted(set(input.left))),
-        right = lambda wildcards, input: ','.join(sorted(set(input.right))),
-        outdir = expand('output/salmon/{sample}_quant', sample = all_samples)
+        outdir = 'output/salmon/{sample}_quant'
     threads:
         20
     singularity:
         salmon_container
     log:
-        'output/logs/salmon_quant.log'
+        'output/logs/salmon_quant_{sample}.log'
     shell:
         'salmon quant '
         '-i {params.index_outdir} '
         '-l ISR '
-        '-1 {params.left} '
-        '-2 {params.right} '
+        '-1 {input.left} '
+        '-2 {input.right} '
         '-o {params.outdir} '
         '-p {threads} '
         '&> {log}'
