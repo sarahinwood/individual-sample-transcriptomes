@@ -85,9 +85,7 @@ rule target:
         'output/trinity_stats/xn50.out.txt',
         'output/trinity_stats/bowtie2_alignment_stats.txt',
         'output/transrate/Trinity/contigs.csv',
-<<<<<<< HEAD
         'output/trinotate/trinotate/Trinotate.sqlite'
-=======
         'output/trinotate/trinotate/Trinotate.sqlite',
         expand('output/salmon/{sample}_quant/quant.sf',
                 sample=all_samples)
@@ -137,8 +135,6 @@ rule salmon_index:
         '-i {params.outdir} '
         '-p {threads} '
         '&> {log}'
-
->>>>>>> 0982cb7d25eb12b5373bede897b4cd874d7f171e
 
 rule trinotate:
     input:
