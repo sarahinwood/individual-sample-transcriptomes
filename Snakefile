@@ -85,56 +85,7 @@ rule target:
         'output/trinity_stats/xn50.out.txt',
         'output/trinity_stats/bowtie2_alignment_stats.txt',
         'output/transrate/Trinity/contigs.csv',
-        'output/trinotate/trinotate/Trinotate.sqlite',
-        expand('output/salmon/{sample}_quant/quant.sf',
-            sample=all_samples)
-
-rule salmon_quant:
-    input:
-        index_output = 'output/salmon/transcripts_index/hash.bin',
-        left = 'output/bbduk_trim/{sample}_r1.fq.gz',
-        right = 'output/bbduk_trim/{sample}_r2.fq.gz'
-    output:
-        'output/salmon/{sample}_quant/quant.sf'
-    params:
-        index_outdir = 'output/salmon/transcripts_index',
-        outdir = 'output/salmon/{sample}_quant'
-    threads:
-        20
-    singularity:
-        salmon_container
-    log:
-        'output/logs/salmon_quant_{sample}.log'
-    shell:
-        'salmon quant '
-        '-i {params.index_outdir} '
-        '-l ISR '
-        '-1 {input.left} '
-        '-2 {input.right} '
-        '-o {params.outdir} '
-        '-p {threads} '
-        '&> {log}'
-
-rule salmon_index:
-    input:
-        transcriptome_length_filtered = 'output/trinity_filtered_isoforms/isoforms_by_length.fasta'
-    output:
-        'output/salmon/transcripts_index/hash.bin'
-    params:
-        outdir = 'output/salmon/transcripts_index'
-    threads:
-        20
-    singularity:
-        salmon_container
-    log:
-        'output/logs/salmon_index.log'
-    shell:
-        'salmon index '
-        '-t {input.transcriptome_length_filtered} '
-        '-i {params.outdir} '
-        '-p {threads} '
-        '&> {log}'
-
+        'output/trinotate/trinotate/Trinotate.sqlite'
 
 rule trinotate:
     input:
@@ -187,7 +138,8 @@ rule busco:
         '--species tribolium2012 '
         '--mode transcriptome '
         '-f '
-        '&> {log}'
+        '&> {log} '
+        'wait'
 
 rule transrate:
     input:
