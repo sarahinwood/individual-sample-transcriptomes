@@ -83,7 +83,7 @@ rule target:
         'output/trinity_stats/stats.txt',
         'output/trinity_stats/xn50.out.txt',
         'output/trinity_stats/bowtie2_alignment_stats.txt',
-        'output/transrate/Trinity/contigs.csv',
+        ##'output/transrate/Trinity/contigs.csv', - not currently running
         'output/trinotate/trinotate/Trinotate.sqlite',
         expand('output/salmon/{sample}_quant/quant.sf',
                 sample=all_samples)
@@ -349,7 +349,7 @@ rule trinity_abundance:
         '--transcripts {input.transcripts} '
         '--seqType fq '
         '--est_method RSEM '
-        '--aln_method bowtie '
+        '--aln_method bowtie2 '
         '--output_dir {params.outdir} '
         '--prep_reference '
         '--SS_lib_type RF '
