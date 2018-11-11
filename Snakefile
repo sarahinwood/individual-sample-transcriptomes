@@ -51,6 +51,8 @@ read_dir = 'data/reads'
 
 sample_key_file = 'data/sample_key.csv'
 
+full_sample_key_file = 'data/full_sample_key_file.csv'
+
 bbduk_adapters = '/adapters.fa'
 
 #containers
@@ -68,8 +70,10 @@ salmon_container = 'shub://TomHarrop/singularity-containers:salmon_0.11.1'
 all_fastq = find_read_files(read_dir)
 
 sample_key = pandas.read_csv(sample_key_file)
-
 all_samples = sorted(set(sample_key['Sample_name']))
+
+full_sample_key = pandas.read_csv(full_sample_key_file)
+full_sample_list = (sorted(set(full_sample_key['Sample_name'])))
 
 #########
 # RULES #
@@ -86,7 +90,7 @@ rule target:
         ##'output/transrate/Trinity/contigs.csv', - not currently running
         'output/trinotate/trinotate/Trinotate.sqlite',
         expand('output/salmon/{sample}_quant/quant.sf',
-                sample=all_samples)
+                sample=full_sample_list)
 
 rule salmon_quant:
     input:
@@ -166,7 +170,8 @@ rule busco:
     output:
         'output/busco/run_{filter}/full_table_{filter}.tsv'
     log:
-        'busco_{filter}.log'
+        str(pathlib2.Path(resolve_path('output/logs/'),
+                            'busco_{filter}.log'))
     params:
         wd = 'output/busco',
         filtered_fasta = lambda wildcards, input: resolve_path(input.filtered_fasta),
@@ -178,6 +183,7 @@ rule busco:
     shell:
         'cd {params.wd} || exit 1 ; '
         'run_BUSCO.py '
+        '--force '
         '--in {params.filtered_fasta} '
         '--out {wildcards.filter} '
         '--lineage {params.lineage} '
@@ -186,7 +192,6 @@ rule busco:
         '--mode transcriptome '
         '-f '
         '&> {log} '
-        'wait'
 
 rule transrate:
     input:
