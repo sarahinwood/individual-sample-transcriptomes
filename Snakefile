@@ -51,8 +51,6 @@ read_dir = 'data/reads'
 
 sample_key_file = 'data/sample_key.csv'
 
-full_sample_key_file = 'data/full_sample_key_file.csv'
-
 bbduk_adapters = '/adapters.fa'
 
 #containers
@@ -72,9 +70,6 @@ all_fastq = find_read_files(read_dir)
 sample_key = pandas.read_csv(sample_key_file)
 all_samples = sorted(set(sample_key['Sample_name']))
 
-full_sample_key = pandas.read_csv(full_sample_key_file)
-full_sample_list = (sorted(set(full_sample_key['Sample_name'])))
-
 #########
 # RULES #
 #########
@@ -87,10 +82,10 @@ rule target:
         'output/trinity_stats/stats.txt',
         'output/trinity_stats/xn50.out.txt',
         'output/trinity_stats/bowtie2_alignment_stats.txt',
-        ##'output/transrate/Trinity/contigs.csv', - not currently running
+        'output/transrate/Trinity/contigs.csv',
         'output/trinotate/trinotate/Trinotate.sqlite',
         expand('output/salmon/{sample}_quant/quant.sf',
-                sample=full_sample_list)
+                sample=all_samples)
 
 rule salmon_quant:
     input:
