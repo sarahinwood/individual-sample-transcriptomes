@@ -36,13 +36,13 @@ split.first.blastx <- first.blastx.hit[,tstrsplit(V1, "^", fixed=TRUE), by=`#gen
 genes.per.taxa <- split.first.blastx[,length(unique(`#gene_id`)), by=V7]
 setkey(genes.per.taxa, V1)
 print(genes.per.taxa)
-fwrite(genes.per.taxa, "output/trinotate/trinotate/genes_per_taxa.csv")
+fwrite(genes.per.taxa, "output/trinotate/genes_per_taxa.csv")
 
 #meanwhile in excel sort for taxa with most annotations, delete those with low no.
 #I'm not interested in, and alter taxa name to just genera
 
 #plot annotations per taxa
-plot.genes.per.taxa <- fread("output/trinotate/trinotate/genes_per_taxa_edited_for_plot.csv")
+plot.genes.per.taxa <- fread("output/trinotate/genes_per_taxa_edited_for_plot.csv")
 
 ggplot(plot.genes.per.taxa, aes(x=reorder(V7, -V1), y=V1))+
   theme(axis.text.x = element_text(angle = 65, hjust = 1, face = "italic")) +
