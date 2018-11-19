@@ -1,15 +1,16 @@
-de novo transcriptome assembly using Trinity
+de novo transcriptome assembly using Trinity:
 
-1. bbduk_trim
-2. fastqc
-3. bbmerge
-4. merge_all_r1_reads
-5. run_trinity
-6. trinity_abundance
-7. trinity_exp_matrices
-8. trinity_stats
-9. plot_x50.r
-10. sort_isoforms.r
-11. filter_trinity_isoforms
-12. run_bowtie2
-13. for BUSCO analysis of the transcriptome, see asw-transcriptome-busco folder in /Network/Servers/biocldap.otago.ac.nz/Volumes/BiochemXsan/student_users/sarahinwood/Projects
+Snakefile now contains all major steps in transcriptome assembly and analysis pipeline, with other scripts for analysis and/or plotting in R.
+
+To run must create a virtual environment, and install via pip3:
+-pathlib2
+-pandas
+-os
+-trinotate pipeline (see https://github.com/TomHarrop/trinotate_pipeline)
+
+Must add below to bin folder:
+-transrate
+-trinotate folder from lab folder (also export path to it via:
+					bin_dir="$(readlink -f bin/trinotate/bin)"
+					export PATH="${bin_dir}:${PATH}"
+					)
