@@ -85,7 +85,8 @@ rule target:
         ##'output/transrate/Trinity/contigs.csv', - not working
         'output/trinotate/trinotate/Trinotate.sqlite',
         expand('output/salmon/{sample}_quant/quant.sf',
-                sample=all_samples)
+                sample=all_samples),
+        'output/length_filtered/busco/run_above_500/full_table_above_500.tsv'
 
 rule salmon_quant:
     input:
@@ -157,6 +158,36 @@ rule trinotate:
         '--outdir {params.wd} '
         '--threads {threads} '
         '&> {log}'
+
+rule busco_above_500:
+    input:
+        filtered_fasta = 'output/length_filtered/longest_transcripts_above_500.fasta',
+        lineage = 'data/endopterygota_odb9'
+    output:
+        'output/length_filtered/busco/run_above_500/full_table_above_500.tsv'
+    log:
+        str(pathlib2.Path(resolve_path('output/length_filtered/'),
+                            'busco_above_500.log'))
+    params:
+        wd = 'output/length_filtered/busco',
+        filtered_fasta = lambda wildcards, input: resolve_path(input.filtered_fasta),
+        lineage = lambda wildcards, input: resolve_path(input.lineage)
+    threads:
+        20
+    singularity:
+        busco_container
+    shell:
+        'cd {params.wd} || exit 1 ; '
+        'run_BUSCO.py '
+        '--force '
+        '--in {params.filtered_fasta} '
+        '--out above_500 '
+        '--lineage {params.lineage} '
+        '--cpu {threads} '
+        '--species tribolium2012 '
+        '--mode transcriptome '
+        '-f '
+        '&> {log} '
 
 rule busco:
     input:
