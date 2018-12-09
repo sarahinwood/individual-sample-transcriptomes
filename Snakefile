@@ -59,6 +59,7 @@ busco_container = 'shub://TomHarrop/singularity-containers:busco_3.0.2'
 tidyverse_container = 'shub://TomHarrop/singularity-containers:r_3.5.0'
 trinity_container = 'images/trinity_2.8.4_py2.simg'
 salmon_container = 'shub://TomHarrop/singularity-containers:salmon_0.11.1'
+kraken_container = 'shub://TomHarrop/singularity-containers:kraken_2.0.7beta'
 
 #########
 # SETUP #
@@ -82,10 +83,11 @@ rule target:
         'output/trinity_stats/stats.txt',
         'output/trinity_stats/xn50.out.txt',
         'output/trinity_stats/bowtie2_alignment_stats.txt',
-        'output/transrate/Trinity/contigs.csv',
+        ###'output/transrate/Trinity/contigs.csv', - not currently running, need to troubleshoot ###
         'output/trinotate/trinotate/Trinotate.sqlite',
         expand('output/salmon/{sample}_quant/quant.sf',
-                sample=all_samples)
+                sample=all_samples),
+        'output/kraken/kraken_report.txt'
 
 rule salmon_quant:
     input:
@@ -202,7 +204,7 @@ rule transrate:
         right = lambda wildcards, input: ','.join(sorted(set(input.right))),
          outdir = 'output/transrate/'
     threads:
-        20
+        50
     shell:
         'bin/transrate/transrate '
         '--assembly {input.transcriptome} '
@@ -434,6 +436,31 @@ rule fastqc:
     shell:
         'mkdir -p {output} ; '
         'fastqc --outdir {output} {input}'
+
+rule kraken:
+    input:
+        r1 = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
+        r2 = expand('output/bbduk_trim/{sample}_r2.fq.gz', sample=all_samples),
+        db = 'data/20180917-krakendb'
+    output:
+        out = 'output/kraken/kraken_out.txt',
+        report = 'output/kraken/kraken_report.txt'
+    log:
+        'output/logs/kraken.log'
+    threads:
+        20
+    singularity:
+        kraken_container
+    shell:
+        'kraken2 '
+        '--threads {threads} '
+        '--db {input.db} '
+        '--paired '
+        '--output {output.out} '
+        '--report {output.report} '
+        '--use-names '
+        '{input.r1} {input.r2} '
+        '&> {log}'
 
 rule bbduk_trim:
     input:
