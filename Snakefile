@@ -107,6 +107,7 @@ rule salmon_quant:
         '-l ISR '
         '-1 {input.left} '
         '-2 {input.right} '
+        '--writeUnmappedNames '
         '-o {params.outdir} '
         '-p {threads} '
         '&> {log}'
