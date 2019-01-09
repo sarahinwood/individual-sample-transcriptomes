@@ -58,7 +58,6 @@ bbduk_container = 'shub://TomHarrop/singularity-containers:bbmap_38.00'
 busco_container = 'shub://TomHarrop/singularity-containers:busco_3.0.2'
 tidyverse_container = 'shub://TomHarrop/singularity-containers:r_3.5.0'
 trinity_container = 'images/trinity_2.8.4_py2.simg'
-salmon_container = 'shub://TomHarrop/singularity-containers:salmon_0.11.1'
 
 #########
 # SETUP #
@@ -84,53 +83,6 @@ rule target:
         'output/trinity_stats/bowtie2_alignment_stats.txt',
         ##'output/transrate/Trinity/contigs.csv', - still not working ##
         'output/trinotate/trinotate/Trinotate.sqlite'
-
-rule salmon_quant:
-    input:
-        index_output = 'output/salmon/transcripts_index/hash.bin',
-        left = 'output/bbduk_trim/{sample}_r1.fq.gz',
-        right = 'output/bbduk_trim/{sample}_r2.fq.gz'
-    output:
-        'output/salmon/{sample}_quant/quant.sf'
-    params:
-        index_outdir = 'output/salmon/transcripts_index',
-        outdir = 'output/salmon/{sample}_quant'
-    threads:
-        20
-    singularity:
-        salmon_container
-    log:
-        'output/logs/salmon_quant_{sample}.log'
-    shell:
-        'salmon quant '
-        '-i {params.index_outdir} '
-        '-l ISR '
-        '-1 {input.left} '
-        '-2 {input.right} '
-        '--writeUnmappedNames '
-        '-o {params.outdir} '
-        '-p {threads} '
-        '&> {log}'
-
-rule salmon_index:
-    input:
-        transcriptome_length_filtered = 'output/trinity_filtered_isoforms/isoforms_by_length.fasta'
-    output:
-        'output/salmon/transcripts_index/hash.bin'
-    params:
-        outdir = 'output/salmon/transcripts_index'
-    threads:
-        20
-    singularity:
-        salmon_container
-    log:
-        'output/logs/salmon_index.log'
-    shell:
-        'salmon index '
-        '-t {input.transcriptome_length_filtered} '
-        '-i {params.outdir} '
-        '-p {threads} '
-        '&> {log}'
 
 rule trinotate:
     input:
