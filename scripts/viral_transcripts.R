@@ -17,9 +17,19 @@ ggplot(plot.viral.taxa, aes(x=reorder(V7, -V1), y=V1))+
   theme(axis.text.x = element_text(angle = 65, hjust = 1, face = "italic")) +
   geom_col()+xlab("Viral Genera")+ylab("Number of BlastX Annotations")
 
-
+##get list of all viral genes and annots to later pull out viral transcript sequences
 trinotate_virus_annots <- dplyr::filter(annotation.report, grepl('virus', sprot_Top_BLASTX_hit))
 fwrite(trinotate_virus_annots, "output/trinotate/viral/viral_annots_trinotate.csv")
+##remove hits from transposons - look into later
+viral_not_transposon <- data.table(dplyr::filter(trinotate_virus_annots, !grepl('transposon', sprot_Top_BLASTX_hit)))
+fwrite(viral_not_transposon, "output/trinotate/viral/viral_annots.csv")
+##write list of viral transcript IDs to pull out of fasta file
+viral_transcripts <- viral_not_transposon[,transcript_id]
+fwrite(list(viral_transcripts), "output/trinotate/viral/viral_transcript_ids.txt")
+##^^wont include manual hits e.g. bro genes
+
+##virus transposon transcripts
+transposon <- dplyr::filter(trinotate_virus_annots, grepl('transposon', sprot_Top_BLASTX_hit))
 
 ##sort out viral annots
 dedup_virus_annots <- fread("output/trinotate/viral/dedup_viral_annots_trinotate.csv")

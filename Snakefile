@@ -3,6 +3,7 @@
 import pathlib2
 import pandas
 import os
+import snap
 
 #############
 # FUNCTIONS #
@@ -57,7 +58,7 @@ bbduk_adapters = '/adapters.fa'
 bbduk_container = 'shub://TomHarrop/singularity-containers:bbmap_38.00'
 busco_container = 'shub://TomHarrop/singularity-containers:busco_3.0.2'
 tidyverse_container = 'shub://TomHarrop/singularity-containers:r_3.5.0'
-trinity_container = 'images/trinity_2.8.4_py2.simg'
+trinity_container = 'shub://TomHarrop/singularity-containers:trinity_2.8.4'
 
 #########
 # SETUP #
@@ -81,7 +82,7 @@ rule target:
         'output/trinity_stats/stats.txt',
         'output/trinity_stats/xn50.out.txt',
         'output/trinity_stats/bowtie2_alignment_stats.txt',
-        ##'output/transrate/Trinity/contigs.csv', - still not working ##
+        'output/transrate/Trinity/contigs.csv',
         'output/trinotate/trinotate/Trinotate.sqlite'
 
 rule trinotate:
@@ -151,7 +152,7 @@ rule transrate:
     params:
         left = lambda wildcards, input: ','.join(sorted(set(input.left))),
         right = lambda wildcards, input: ','.join(sorted(set(input.right))),
-         outdir = 'output/transrate/'
+        outdir = 'output/transrate/'
     threads:
         50
     shell:
