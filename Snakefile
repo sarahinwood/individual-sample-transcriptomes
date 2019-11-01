@@ -76,30 +76,30 @@ all_samples = sorted(set(sample_key['Sample_name']))
 
 rule target:
     input:
-        expand('output/busco/run_{filter}/full_table_{filter}.tsv',
-                filter=['expression', 'length']),
+        expand('output/{sample}/busco/run_{filter}/full_table_{filter}.tsv',
+                filter=['expression', 'length'], sample=all_samples),
         'output/fastqc',
-        'output/trinity_stats/stats.txt',
-        'output/trinity_stats/xn50.out.txt',
-        'output/trinity_stats/bowtie2_alignment_stats.txt',
-        'output/transrate/Trinity/contigs.csv',
-        'output/trinotate/trinotate/Trinotate.sqlite'
+        expand('output/{sample}/trinity_stats/stats.txt', sample=all_samples),
+        expand('output/{sample}/trinity_stats/xn50.out.txt', sample=all_samples),
+        expand('output/{sample}/trinity_stats/bowtie2_alignment_stats.txt', sample=all_samples),
+        #'output/transrate/Trinity/contigs.csv',
+        expand('output/{sample}/trinotate/trinotate/Trinotate.sqlite', sample=all_samples)
 
 rule trinotate:
     input:
-        fasta = 'output/trinity/Trinity.fasta',
+        fasta = 'output/{sample}/trinity/Trinity.fasta',
         blastdb = 'bin/trinotate/db/uniprot_sprot.pep',
         hmmerdb = 'bin/trinotate/db/Pfam-A.hmm',
         sqldb = 'bin/trinotate/db/Trinotate.sqlite'
     output:
-        'output/trinotate/trinotate/trinotate_annotation_report.txt',
-        'output/trinotate/trinotate/Trinotate.sqlite'
+        'output/{sample}/trinotate/trinotate/trinotate_annotation_report.txt',
+        'output/{sample}/trinotate/trinotate/Trinotate.sqlite'
     params:
-        wd = 'output/trinotate'
+        wd = 'output/{sample}/trinotate'
     threads:
         20
     log:
-        'output/logs/trinotate.log'
+        'output/logs/{sample}/trinotate.log'
     shell:
         'trinotate_pipeline '
         '--trinity_fasta {input.fasta} '
@@ -112,15 +112,15 @@ rule trinotate:
 
 rule busco:
     input:
-        filtered_fasta = 'output/trinity_filtered_isoforms/isoforms_by_{filter}.fasta',
+        filtered_fasta = 'output/{sample}/trinity_filtered_isoforms/isoforms_by_{filter}.fasta',
         lineage = 'data/endopterygota_odb9'
     output:
-        'output/busco/run_{filter}/full_table_{filter}.tsv'
+        'output/{sample}/busco/run_{filter}/full_table_{filter}.tsv'
     log:
-        str(pathlib2.Path(resolve_path('output/logs/'),
+        str(pathlib2.Path(resolve_path('output/logs/{sample}/'),
                             'busco_{filter}.log'))
     params:
-        wd = 'output/busco',
+        wd = 'output/{sample}/busco',
         filtered_fasta = lambda wildcards, input: resolve_path(input.filtered_fasta),
         lineage = lambda wildcards, input: resolve_path(input.lineage)
     threads:
@@ -142,13 +142,13 @@ rule busco:
 
 rule transrate:
     input:
-        transcriptome = 'output/trinity/Trinity.fasta',
-        left = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
-        right = expand('output/bbduk_trim/{sample}_r2.fq.gz', sample=all_samples)
+        transcriptome = 'output/{sample}/trinity/Trinity.fasta',
+        left = 'output/bbduk_trim/{sample}_r1.fq.gz',
+        right = 'output/bbduk_trim/{sample}_r2.fq.gz'
     output:
-        'output/transrate/Trinity/contigs.csv'
+        'output/{sample}/transrate/Trinity/contigs.csv'
     log:
-        'output/logs/transrate.log'
+        'output/logs/{sample}/transrate.log'
     params:
         left = lambda wildcards, input: ','.join(sorted(set(input.left))),
         right = lambda wildcards, input: ','.join(sorted(set(input.right))),
@@ -167,11 +167,11 @@ rule transrate:
 
 rule bowtie2_alignment_stats:
     input:
-        transcriptome = 'output/trinity/Trinity.fasta',
-        left = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
-        right = expand('output/bbduk_trim/{sample}_r2.fq.gz', sample=all_samples)
+        transcriptome = 'output/{sample}/trinity/Trinity.fasta',
+        left = 'output/bbduk_trim/{sample}_r1.fq.gz',
+        right = 'output/bbduk_trim/{sample}_r2.fq.gz'
     output:
-        alignment_stats = 'output/trinity_stats/bowtie2_alignment_stats.txt'
+        alignment_stats = 'output/{sample}/trinity_stats/bowtie2_alignment_stats.txt'
     params:
         index_basename = 'output/trinity_stats/Trinity.fasta.index',
         left = lambda wildcards, input: ','.join(sorted(set(input.left))),
@@ -195,12 +195,12 @@ rule bowtie2_alignment_stats:
 
 rule filter_trinity_isoforms:
     input:
-        transcriptome = 'output/trinity/Trinity.fasta',
-        isoforms = 'output/trinity_filtered_isoforms/isoforms_by_{filter}.txt'
+        transcriptome = 'output/{sample}/trinity/Trinity.fasta',
+        isoforms = 'output/{sample}/trinity_filtered_isoforms/isoforms_by_{filter}.txt'
     output:
-        sorted_fasta = 'output/trinity_filtered_isoforms/isoforms_by_{filter}.fasta'
+        sorted_fasta = 'output/{sample}/trinity_filtered_isoforms/isoforms_by_{filter}.fasta'
     log:
-        'output/logs/filter_isoforms_by_{filter}.log'
+        'output/logs/{sample}/filter_isoforms_by_{filter}.log'
     singularity:
         bbduk_container
     shell:
@@ -213,27 +213,27 @@ rule filter_trinity_isoforms:
 
 rule sort_isoforms_r:
     input:
-        abundance = 'output/trinity_abundance/RSEM.isoforms.results'
+        abundance = 'output/{sample}/trinity_abundance/RSEM.isoforms.results'
     output:
-        expression = 'output/trinity_filtered_isoforms/isoforms_by_expression.txt',
-        length = 'output/trinity_filtered_isoforms/isoforms_by_length.txt'
+        expression = 'output/{sample}/trinity_filtered_isoforms/isoforms_by_expression.txt',
+        length = 'output/{sample}/trinity_filtered_isoforms/isoforms_by_length.txt'
     singularity:
         tidyverse_container
     log:
-        'output/logs/sort_isoforms_r.log'
+        'output/logs/{sample}/sort_isoforms_r.log'
     script:
         'scripts/sort_isoforms.R'
 
 rule ExN50_stats:
     input:
-        abundance = 'output/trinity_abundance/RSEM.isoform.TPM.not_cross_norm',
-        transcriptome = 'output/trinity/Trinity.fasta'
+        abundance = 'output/{sample}/trinity_abundance/RSEM.isoform.TPM.not_cross_norm',
+        transcriptome = 'output/{sample}/trinity/Trinity.fasta'
     output:
-        ExN50_stats = 'output/trinity_stats/xn50.out.txt'
+        ExN50_stats = 'output/{sample}/trinity_stats/xn50.out.txt'
     singularity:
         trinity_container
     log:
-        'output/logs/xn50.err.txt'
+        'output/logs/{sample}/xn50.err.txt'
     shell:
         'contig_ExN50_statistic.pl '
         '{input.abundance} '
@@ -243,13 +243,13 @@ rule ExN50_stats:
 
 rule trinity_stats:
     input:
-        transcriptome = 'output/trinity/Trinity.fasta'
+        transcriptome = 'output/{sample}/trinity/Trinity.fasta'
     output:
-        stats = 'output/trinity_stats/stats.txt'
+        stats = 'output/{sample}/trinity_stats/stats.txt'
     singularity:
         trinity_container
     log:
-        'output/logs/trinity_stats.log'
+        'output/logs/{sample}/trinity_stats.log'
     shell:
         'TrinityStats.pl '
         '{input.transcriptome} '
@@ -258,17 +258,17 @@ rule trinity_stats:
 
 rule trinity_abundance_to_matrix:
     input:
-        gt_map = 'output/trinity/Trinity.fasta.gene_trans_map',
-        abundance = 'output/trinity_abundance/RSEM.isoforms.results'
+        gt_map = 'output/{sample}/trinity/Trinity.fasta.gene_trans_map',
+        abundance = 'output/{sample}/trinity_abundance/RSEM.isoforms.results'
     output:
-        'output/trinity_abundance/RSEM.isoform.counts.matrix',
-        'output/trinity_abundance/RSEM.isoform.TPM.not_cross_norm'
+        'output/{sample}/trinity_abundance/RSEM.isoform.counts.matrix',
+        'output/{sample}/trinity_abundance/RSEM.isoform.TPM.not_cross_norm'
     params:
         prefix = 'output/trinity_abundance/RSEM'
     singularity:
         trinity_container
     log:
-        'output/logs/abundance_estimates_to_matrix.log'
+        'output/logs/{sample}/abundance_estimates_to_matrix.log'
     shell:
         'abundance_estimates_to_matrix.pl '
         '--est_method RSEM '
@@ -280,17 +280,17 @@ rule trinity_abundance_to_matrix:
 
 rule trinity_abundance:
     input:
-        transcripts = 'output/trinity/Trinity.fasta',
-        left = expand('output/bbduk_trim/{sample}_r1.fq.gz', sample=all_samples),
-        right = expand('output/bbduk_trim/{sample}_r2.fq.gz', sample=all_samples)
+        transcripts = 'output/{sample}/trinity/Trinity.fasta',
+        left = 'output/bbduk_trim/{sample}_r1.fq.gz',
+        right = 'output/bbduk_trim/{sample}_r2.fq.gz'
     output:
-        'output/trinity_abundance/RSEM.isoforms.results'
+        'output/{sample}/trinity_abundance/RSEM.isoforms.results'
     singularity:
         trinity_container
     threads:
         20
     log:
-        'output/logs/trinity_abundance.log'
+        'output/logs/{sample}/trinity_abundance.log'
     params:
         outdir = 'output/trinity_abundance',
         left = lambda wildcards, input: ','.join(sorted(set(input.left))),
@@ -312,11 +312,11 @@ rule trinity_abundance:
 
 rule Trinity:
     input:
-        left = expand('output/bbmerge/{sample}_all_r1.fq.gz', sample=all_samples),
-        right = expand('output/bbmerge/{sample}_unmerged_r2.fq.gz', sample=all_samples)
+        left = 'output/bbmerge/{sample}_all_r1.fq.gz',
+        right = 'output/bbmerge/{sample}_unmerged_r2.fq.gz'
     output:
-        'output/trinity/Trinity.fasta',
-        'output/trinity/Trinity.fasta.gene_trans_map'
+        'output/{sample}/trinity/Trinity.fasta',
+        'output/{sample}/trinity/Trinity.fasta.gene_trans_map'
     params:
         outdir = 'output/trinity',
         left = lambda wildcards, input: ','.join(sorted(set(input.left))),
@@ -326,7 +326,7 @@ rule Trinity:
     threads:
         20
     log:
-        'output/logs/trinity.log'
+        'output/logs/{sample}/trinity.log'
     shell:
         'Trinity '
         '--SS_lib_type RF '
@@ -359,7 +359,7 @@ rule bbmerge:
     params:
         adapters = bbduk_adapters
     log:
-        'output/logs/bbduk_merge/{sample}.log'
+        'output/logs/{sample}/bbduk_merge/{sample}.log'
     singularity:
         bbduk_container
     threads:
@@ -397,7 +397,7 @@ rule bbduk_trim:
     params:
         adapters = bbduk_adapters
     log:
-        'output/logs/bbduk_trim/{sample}.log'
+        'output/logs/{sample}/bbduk_trim/{sample}.log'
     threads:
         20
     singularity:

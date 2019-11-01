@@ -4,7 +4,7 @@ library(stringr)
 library(ggplot2)
 
 #Get annotation report in right format for venn diagram
-annotation.report <- fread('output/trinotate/trinotate/trinotate_annotation_report.txt', na.strings = ".")
+annotation.report <- fread('all_NC_output/trinotate/trinotate/trinotate_annotation_report.txt', na.strings = ".")
 pfam <- annotation.report[!is.na(Pfam), unique(`#gene_id`)]
 blastx <- annotation.report[!is.na(sprot_Top_BLASTX_hit), unique(`#gene_id`)]
 kegg <- annotation.report[!is.na(Kegg), unique(`#gene_id`)]
@@ -36,13 +36,13 @@ split.first.blastx <- first.blastx.hit[,tstrsplit(V1, "^", fixed=TRUE), by=`#gen
 genes.per.taxa <- split.first.blastx[,length(unique(`#gene_id`)), by=V7]
 setkey(genes.per.taxa, V1)
 print(genes.per.taxa)
-fwrite(genes.per.taxa, "output/trinotate/genes_per_taxa.csv")
+fwrite(genes.per.taxa, "all_NC_output/trinotate/genes_per_taxa.csv")
 
 #meanwhile in excel sort for taxa with most annotations, delete those with low no.
 #I'm not interested in, and alter taxa name to just genera
 
 #plot annotations per taxa
-plot.genes.per.taxa <- fread("output/trinotate/genes_per_taxa_edited_for_plot.csv")
+plot.genes.per.taxa <- fread("all_NC_output/trinotate/genes_per_taxa_edited_for_plot.csv")
 
 ggplot(plot.genes.per.taxa, aes(x=reorder(V7, -V1), y=V1))+
   theme(axis.text.x = element_text(angle = 65, hjust = 1, face = "italic")) +
